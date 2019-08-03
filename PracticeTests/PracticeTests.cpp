@@ -1,19 +1,21 @@
 #include "pch.h"
 #include "CppUnitTest.h"
 #include "../cpp-practice/LinkedList.h"
+#include "../cpp-practice/OutOfRangeException.h"
+#include "../cpp-practice/ListIsNotEmptyException.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace PracticeTests
 {
-	static LinkedList* ll;
+	static LinkedList<int>* ll;
 
 	TEST_CLASS(LinkedListTests)
 	{
 	public:
 		TEST_METHOD_INITIALIZE(Setup) 
 		{
-			ll = new LinkedList();
+			ll = new LinkedList<int>();
 		}
 
 		TEST_METHOD_CLEANUP(Cleanup)
@@ -98,7 +100,7 @@ namespace PracticeTests
 		{
 			ll->Add(1);
 
-			Assert::ExpectException<LinkedList::OutOfRangeException>([] {ll->Get(-1);});
+			Assert::ExpectException<OutOfRangeException>([] {ll->Get(-1);});
 		}
 
 		TEST_METHOD(Remove_IfListIsNotEmpty_RemovesElement)
@@ -117,12 +119,12 @@ namespace PracticeTests
 
 		TEST_METHOD(Remove_IfListIsEmpty_ThrowsListIsEmptyException)
 		{
-			Assert::ExpectException<LinkedList::ListIsEmptyException>([] {ll->Remove(0);});
+			Assert::ExpectException<ListIsEmptyException>([] {ll->Remove(0);});
 		}
 
 		TEST_METHOD(RemoveFirst_IfListIsEmpty_ThrowsListIsEmptyException)
 		{
-			Assert::ExpectException<LinkedList::ListIsEmptyException>([] {ll->RemoveFirst();});
+			Assert::ExpectException<ListIsEmptyException>([] {ll->RemoveFirst();});
 		}
 
 		TEST_METHOD(RemoveFirst_IfListIsNotEmpty_RemovesFirstElement)
@@ -166,7 +168,7 @@ namespace PracticeTests
 
 		TEST_METHOD(RemoveLast_IfListIsEmpty_ThrowsListIsEmptyException)
 		{
-			Assert::ExpectException<LinkedList::ListIsEmptyException>([] {ll->RemoveLast();});
+			Assert::ExpectException<ListIsEmptyException>([] {ll->RemoveLast();});
 		}
 
 		TEST_METHOD(RemoveLast_IfListIsNotEmpty_LengthDecreasesProperly)
