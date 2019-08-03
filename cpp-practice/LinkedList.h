@@ -1,10 +1,15 @@
 #pragma once
 #include "ListIsNotEmptyException.h"
 #include "OutOfRangeException.h"
+#include "ItemNotFoundException.h"
+#include <iterator>
+
+using namespace std;
 
 template <typename T>
 class LinkedList
 {
+	struct Node;
 public:
 	LinkedList();
 	~LinkedList();
@@ -17,31 +22,90 @@ public:
 	void AddToStart(T value);
 	void AddToEnd(T value);
 	void Insert(T value, int index);
+	bool Contains(T value);
+	int Find(T value);
 	void RemoveFirst();
 	void RemoveLast();
 	void Remove(int index);
+
+	class ForwardIterator;
+
+	ForwardIterator begin()
+	{
+		return ForwardIterator(firstNode);
+	}
+
+	ForwardIterator end()
+	{
+		return ForwardIterator(nullptr);
+	}
+
+	class ForwardIterator : public iterator<forward_iterator_tag, T>
+	{
+		typedef ForwardIterator	iterator;
+		const Node* currentPos;
+	public:
+		ForwardIterator()
+		{
+			this->currentPos = nullptr;
+		}
+		ForwardIterator(const Node* node)
+		{
+			this->currentPos = node;
+		}
+
+		ForwardIterator& operator++()
+		{
+			if (currentPos) currentPos = currentPos->next;
+			return *this;
+		}
+		ForwardIterator operator++(int)
+		{
+			ForwardIterator iterator = *this;
+			++* this;
+			return iterator;
+		}
+		bool operator!=(const ForwardIterator iterator)
+		{
+			return currentPos != iterator.currentPos;
+		}
+		T operator*()
+		{
+			return currentPos->value;
+		}
+	};
 private:
-	template <typename T>
 	struct Node
 	{
 		T value;
-		Node<T>* next;
-		Node<T>* previous;
+		Node* next = nullptr;
+		Node* previous = nullptr;
+		friend class ForwardIterator;
 	};
 	int length;
-	Node<T>* firstNode;
-	Node<T>* lastNode;
-	Node<T>* currentNode;
-	Node<T>* GetNode(int index);
+	Node* firstNode;
+	Node* lastNode;
+	Node* currentNode;
+	Node* GetNode(int index)
+	{
+		if (index == 0) { return firstNode; }
+		else if (index == length - 1) { return lastNode; }
+		currentNode = firstNode;
+		for (size_t i = 0; i < index; i++)
+		{
+			currentNode = currentNode->next;
+		}
+		return currentNode;
+	}
 };
 
 template<typename T>
 LinkedList<T>::LinkedList()
 {
 	length = 0;
-	currentNode = NULL;
-	lastNode = NULL;
-	firstNode = NULL;
+	currentNode = nullptr;
+	lastNode = nullptr;
+	firstNode = nullptr;
 }
 
 template<typename T>
@@ -101,13 +165,13 @@ void LinkedList<T>::AddToEnd(T value)
 {
 	if (length == 0)
 	{
-		firstNode = new Node<T>;
+		firstNode = new Node;
 		lastNode = firstNode;
 	}
 	else
 	{
 		currentNode = lastNode;
-		currentNode->next = new Node<T>;
+		currentNode->next = new Node;
 		lastNode = currentNode->next;
 		lastNode->previous = currentNode;
 	}
@@ -120,13 +184,13 @@ void LinkedList<T>::AddToStart(T value)
 {
 	if (length == 0)
 	{
-		firstNode = new Node<T>;
+		firstNode = new Node;
 		lastNode = firstNode;
 	}
 	else
 	{
 		currentNode = firstNode;
-		currentNode->previous = new Node<T>;
+		currentNode->previous = new Node;
 		firstNode = currentNode->previous;
 		firstNode->next = currentNode;
 	}
@@ -149,13 +213,51 @@ void LinkedList<T>::Insert(T value, int index)
 	}
 	if (index < 0 || index > length) { throw OutOfRangeException(); }
 	currentNode = GetNode(index);
-	Node<T>* newNode = new Node<T>;
+	Node* newNode = new Node;
 	newNode->value = value;
 	newNode->previous = currentNode->previous;
 	newNode->next = currentNode;
 	currentNode->previous->next = newNode;
 	currentNode->previous = newNode;
 	length++;
+}
+
+template<typename T>
+inline bool LinkedList<T>::Contains(T value)
+{
+	currentNode = firstNode;
+	while (currentNode)
+	{
+		if (currentNode->value == value)
+		{
+			return true;
+		}
+		currentNode = currentNode->next;
+	}
+	return false;
+}
+
+template<typename T>
+inline int LinkedList<T>::Find(T value)
+{
+	bool found = false;
+	int index = 0;
+	currentNode = firstNode;
+	while (currentNode) 
+	{
+		if (currentNode->value == value) 
+		{
+			found = true;
+			break;
+		}
+		currentNode = currentNode->next;
+		index++;
+	}
+	if (found)
+	{
+		return index;
+	}
+	throw ItemNotFoundException();
 }
 
 template<typename T>
@@ -209,17 +311,4 @@ void LinkedList<T>::Remove(int index)
 	currentNode->previous->next = currentNode->next;
 	delete currentNode;
 	length--;
-}
-
-template<typename T>
-LinkedList<T>::Node<T>* LinkedList<T>::GetNode(int index)
-{
-	if (index == 0) { return firstNode; }
-	else if (index == length - 1) { return lastNode; }
-	currentNode = firstNode;
-	for (size_t i = 0; i < index; i++)
-	{
-		currentNode = currentNode->next;
-	}
-	return currentNode;
 }

@@ -3,6 +3,7 @@
 #include "../cpp-practice/LinkedList.h"
 #include "../cpp-practice/OutOfRangeException.h"
 #include "../cpp-practice/ListIsNotEmptyException.h"
+#include "../cpp-practice/ItemNotFoundException.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -183,6 +184,42 @@ namespace PracticeTests
 
 			Assert::AreEqual(expected, result);
 		}
-		private:
+
+		TEST_METHOD(Find_IfItemIsNotInList_ThrowItemNotFoundException)
+		{
+			Assert::ExpectException<ItemNotFoundException>([]() {ll->Find(1);});
+		}
+
+		TEST_METHOD(Find_IfItemExistsOnce_ReturnItsIndex)
+		{
+			ll->Add(1);
+			ll->Add(2);
+			ll->Add(3);
+
+			Assert::AreEqual(0, ll->Find(1));
+			Assert::AreEqual(1, ll->Find(2));
+			Assert::AreEqual(2, ll->Find(3));
+		}
+
+		TEST_METHOD(Find_IfItemExistsMultipleTimes_ReturnItsIndexOfFirst)
+		{
+			ll->Add(1);
+			ll->Add(2);
+			ll->Add(2);
+
+			Assert::AreEqual(1, ll->Find(2));
+		}
+
+		TEST_METHOD(Contains_IfItemExists_ReturnTrue)
+		{
+			ll->Add(-1);
+
+			Assert::IsTrue(ll->Contains(-1));
+		}
+
+		TEST_METHOD(Contains_IfItemDoesNotExist_ReturnFalse)
+		{
+			Assert::IsFalse(ll->Contains(1));
+		}
 	};
 }

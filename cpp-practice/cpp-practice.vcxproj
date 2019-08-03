@@ -152,11 +152,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cpp-practice.cpp" />
+    <ClCompile Include="ItemNotFoundException.cpp" />
     <ClCompile Include="LinkedList.cpp" />
+    <ClCompile Include="ListIsNotEmptyException.cpp" />
+    <ClCompile Include="OutOfRangeException.cpp" />
     <ClCompile Include="PracticeClass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ItemNotFoundException.h" />
     <ClInclude Include="LinkedList.h" />
+    <ClInclude Include="ListIsNotEmptyException.h" />
+    <ClInclude Include="OutOfRangeException.h" />
     <ClInclude Include="PracticeClass.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
