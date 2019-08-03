@@ -4,6 +4,8 @@
 #include "../cpp-practice/OutOfRangeException.h"
 #include "../cpp-practice/ListIsNotEmptyException.h"
 #include "../cpp-practice/ItemNotFoundException.h"
+#include <array>
+#include <iostream>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -220,6 +222,40 @@ namespace PracticeTests
 		TEST_METHOD(Contains_IfItemDoesNotExist_ReturnFalse)
 		{
 			Assert::IsFalse(ll->Contains(1));
+		}
+
+		TEST_METHOD(Foreach_IfListContainsItems_LoopsThroughAll)
+		{
+			ll->Add(1);
+			ll->Add(2);
+			ll->Add(3);
+
+			std::array<int, 3> result;
+			int index = 0;
+			for (int i : *ll) 
+			{
+				result[index] = i;
+				index++;
+			}
+
+			std::array<int, 3> expected = { 1,2,3 };
+
+			Assert::AreEqual(expected.size(), result.size());
+
+			for (int i = 0; i < expected.size(); i++) {
+				Assert::AreEqual(expected[i], result[i]);
+			}
+		}
+
+		TEST_METHOD(Foreach_IfIsEmpty_LoopsThroughNothing)
+		{
+			bool foundSomething = false;
+			for (int i : *ll)
+			{
+				foundSomething = true;
+			}
+
+			Assert::IsFalse(foundSomething);
 		}
 	};
 }
